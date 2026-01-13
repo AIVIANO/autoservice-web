@@ -1,0 +1,58 @@
+/* Экран: пусть макет контролирует App.jsx (у тебя там app-root с maxWidth) */
+#root {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  max-width: none;
+  text-align: left;
+}
+
+/* Печать */
+.print-area {
+  display: none;
+}
+
+@media print {
+  html,
+  body,
+  #root {
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    max-width: none !important;
+    text-align: left !important;
+    background: #fff !important;
+    color: #000 !important;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  .print-area {
+    display: block !important;
+    background: #fff !important;
+    color: #000 !important;
+    padding: 0 !important;
+  }
+
+  .print-area * {
+    color: #000 !important;
+  }
+
+  /* Таблицы на всю ширину страницы, без “выползаний” */
+  table {
+    width: 100% !important;
+    table-layout: fixed !important;
+  }
+
+  th,
+  td {
+    white-space: normal !important;
+    word-break: break-word;
+  }
+
+  @page {
+    margin: 12mm;
+  }
+}
