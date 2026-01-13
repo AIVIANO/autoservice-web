@@ -1,0 +1,40 @@
+services:
+  db:
+    image: postgres:16
+    container_name: autoservice_db
+    environment:
+      POSTGRES_DB: autoservice
+      POSTGRES_USER: autoservice
+      POSTGRES_PASSWORD: autoservice
+    ports:
+      - "5432:5432"
+    volumes:
+      - dbdata:/var/lib/postgresql/data
+      - ./db/init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U autoservice -d autoservice"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: autoservice_api
+    environment:
+      PORT: 3000
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: autoservice
+      DB_PASSWORD: autoservice
+      DB_NAME: autoservice
+      NODE_ENV: production
+    ports:
+      - "3000:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  dbdata:

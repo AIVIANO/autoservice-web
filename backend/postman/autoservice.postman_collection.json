@@ -1,0 +1,412 @@
+{
+	"info": {
+		"_postman_id": "67b855a8-0e34-4084-b38b-a005c91ada58",
+		"name": "New Collection",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "41176919"
+	},
+	"item": [
+		{
+			"name": "01 Create Client",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"if (pm.response.code === 201) {\r",
+							"  pm.environment.set(\"clientId\", pm.response.json().id);\r",
+							"}"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"full_name\": \"Ivan Petrov\",\r\n  \"phone\": \"+79990001122\",\r\n  \"email\": \"ivan@example.com\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/clients",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"clients"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "02 Create Car",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"if (pm.response.code === 201) {\r",
+							"  pm.environment.set(\"carId\", pm.response.json().id);\r",
+							"}"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"client_id\": {{clientId}},\r\n  \"brand\": \"Toyota\",\r\n  \"model\": \"Camry\",\r\n  \"plate_number\": \"A123BC77\",\r\n  \"vin\": \"JTNB11HK0J3000001\",\r\n  \"year\": 2018\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/cars",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"cars"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "03 Create Booking",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"if (pm.response.code === 201) {\r",
+							"  pm.environment.set(\"bookingId\", pm.response.json().id);\r",
+							"}\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"client_id\": {{clientId}},\r\n  \"car_id\": {{carId}},\r\n  \"scheduled_at\": \"2025-12-22T12:00:00+03:00\",\r\n  \"service_note\": \"TO-1 / zamena masla (retry)\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/bookings",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"bookings"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "04 Confirm Booking",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"booking confirmed\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{ \"status\": \"confirmed\" }\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/bookings/{{bookingId}}/status",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"bookings",
+						"{{bookingId}}",
+						"status"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "05 Create WorkOrder",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"if (pm.response.code === 201) {\r",
+							"  pm.environment.set(\"workOrderId\", pm.response.json().id);\r",
+							"}\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"booking_id\": {{bookingId}},\r\n  \"description\": \"TO-1 / zamena masla\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/work-orders",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"work-orders"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "06 WorkOrder In Progress",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"work order status changed\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"status\": \"closed\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/work-orders/{{workOrderId}}/status",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"work-orders",
+						"{{workOrderId}}",
+						"status"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "07 Add Work Item",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"name\": \"Zamena masla\",\r\n  \"qty\": 1,\r\n  \"unit_price\": 1500\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/work-orders/{{workOrderId}}/work-items",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"work-orders",
+						"{{workOrderId}}",
+						"work-items"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "08 Add Material Item",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"name\": \"Oil filter\",\r\n  \"qty\": 1,\r\n  \"unit_price\": 500\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/work-orders/{{workOrderId}}/material-items",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"work-orders",
+						"{{workOrderId}}",
+						"material-items"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "09 Pay Full Amount",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"amount\": 3500,\r\n  \"method\": \"cash\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/work-orders/{{workOrderId}}/payments",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"work-orders",
+						"{{workOrderId}}",
+						"payments"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "10 WorkOrder Full",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"full contains key sections\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"  const data = pm.response.json();\r",
+							"  pm.expect(data).to.have.property(\"work_order\");\r",
+							"  pm.expect(data).to.have.property(\"work_items\");\r",
+							"  pm.expect(data).to.have.property(\"material_items\");\r",
+							"  pm.expect(data).to.have.property(\"payments\");\r",
+							"  pm.expect(data).to.have.property(\"audit_log\");\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/api/work-orders/{{workOrderId}}/full",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"work-orders",
+						"{{workOrderId}}",
+						"full"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

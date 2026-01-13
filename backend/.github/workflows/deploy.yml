@@ -1,0 +1,42 @@
+name: Deploy to VPS
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            set -e
+            cd /opt/autoservice/autoservice-backend
+            git fetch --all
+            git reset --hard origin/main
+            docker compose down || true
+            docker compose up -d --build
+            docker compose ps
+            
+            echo "Waiting for API /health ..."
+            for i in {1..30}; do
+              if curl -fsS http://127.0.0.1:3000/health >/dev/null; then
+                echo "API is up"
+                break
+              fi
+              echo "Not ready yet ($i/30), sleep 2s..."
+              sleep 2
+            done
+
+            # Финальная проверка (чтобы job упал, если так и не поднялось)
+            curl -fsS http://127.0.0.1:3000/health
+            curl -fsS http://127.0.0.1:3000/health/db

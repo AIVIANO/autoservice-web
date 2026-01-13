@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Autoservice — Staff Panel (MVP)</title>
+
+  <!-- Bootstrap 5 CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+  <div class="container py-4">
+    <div class="d-flex align-items-center justify-content-between mb-3">
+      <h1 class="h3 m-0">Autoservice — Панель сотрудника (MVP)</h1>
+      <div class="text-muted small">API: <code>/api</code> • Health: <code>/health</code></div>
+    </div>
+
+    <div class="alert alert-secondary">
+      <div class="d-flex gap-2 flex-wrap">
+        <button id="btnHealth" class="btn btn-outline-primary btn-sm">Проверить /health</button>
+        <button id="btnHealthDb" class="btn btn-outline-primary btn-sm">Проверить /health/db</button>
+        <button id="btnClearState" class="btn btn-outline-danger btn-sm">Сбросить локальные ID</button>
+      </div>
+      <div class="mt-2 small" id="stateInfo"></div>
+    </div>
+
+    <div class="row g-3">
+      <!-- 1. Client -->
+      <div class="col-12 col-lg-6">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <h2 class="h5">1) Клиент</h2>
+            <div class="mb-2">
+              <label class="form-label">ФИО</label>
+              <input id="clientFullName" class="form-control" placeholder="Иван Петров">
+            </div>
+            <div class="mb-2">
+              <label class="form-label">Email</label>
+              <input id="clientEmail" class="form-control" placeholder="ivan@example.com">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Телефон</label>
+              <input id="clientPhone" class="form-control" placeholder="+79990001122">
+            </div>
+            <button id="btnCreateClient" class="btn btn-primary">Создать клиента</button>
+            <div class="mt-2 small text-muted">Создаёт <code>clientId</code> для следующих шагов.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. Car -->
+      <div class="col-12 col-lg-6">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <h2 class="h5">2) Автомобиль</h2>
+            <div class="mb-2">
+              <label class="form-label">Марка</label>
+              <input id="carMake" class="form-control" placeholder="Toyota">
+            </div>
+            <div class="mb-2">
+              <label class="form-label">Модель</label>
+              <input id="carModel" class="form-control" placeholder="Camry">
+            </div>
+            <div class="mb-2">
+              <label class="form-label">VIN</label>
+              <input id="carVin" class="form-control" placeholder="JTNB11HK0K3000001">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Госномер</label>
+              <input id="carPlate" class="form-control" placeholder="A123BC77">
+            </div>
+            <button id="btnCreateCar" class="btn btn-primary">Добавить авто клиенту</button>
+            <div class="mt-2 small text-muted">Требует <code>clientId</code>. Создаёт <code>carId</code>.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. Booking -->
+      <div class="col-12">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <h2 class="h5">3) Запись (Booking)</h2>
+            <div class="row g-2">
+              <div class="col-12 col-md-4">
+                <label class="form-label">Дата/время (строкой)</label>
+                <input id="bookingDate" class="form-control" placeholder="2025-12-22 12:00">
+              </div>
+              <div class="col-12 col-md-8">
+                <label class="form-label">Комментарий</label>
+                <input id="bookingComment" class="form-control" placeholder="ТО-1, диагностика">
+              </div>
+            </div>
+            <div class="mt-3 d-flex gap-2 flex-wrap">
+              <button id="btnCreateBooking" class="btn btn-primary">Создать booking</button>
+              <button id="btnConfirmBooking" class="btn btn-outline-primary">Подтвердить booking</button>
+            </div>
+            <div class="mt-2 small text-muted">Требует <code>clientId</code> и <code>carId</code>. Создаёт <code>bookingId</code>.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. WorkOrder -->
+      <div class="col-12">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <h2 class="h5">4) Заказ-наряд (Work Order)</h2>
+            <div class="row g-2">
+              <div class="col-12 col-md-8">
+                <label class="form-label">Описание</label>
+                <input id="woDesc" class="form-control" placeholder="ТО-1 / замена масла">
+              </div>
+              <div class="col-12 col-md-4">
+                <label class="form-label">Статус</label>
+                <select id="woStatus" class="form-select">
+                  <option value="new">new</option>
+                  <option value="in_progress">in_progress</option>
+                  <option value="closed">closed</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="mt-3 d-flex gap-2 flex-wrap">
+              <button id="btnCreateWorkOrder" class="btn btn-primary">Создать work order</button>
+              <button id="btnSetWorkOrderStatus" class="btn btn-outline-primary">Установить статус</button>
+              <button id="btnGetWorkOrderFull" class="btn btn-success">Получить WorkOrder Full</button>
+            </div>
+
+            <hr />
+
+            <div class="row g-2">
+              <div class="col-12 col-md-6">
+                <h3 class="h6">Работы</h3>
+                <div class="mb-2">
+                  <input id="workItemName" class="form-control" placeholder="Замена масла">
+                </div>
+                <div class="row g-2 mb-2">
+                  <div class="col-6"><input id="workItemQty" class="form-control" placeholder="1"></div>
+                  <div class="col-6"><input id="workItemPrice" class="form-control" placeholder="1500"></div>
+                </div>
+                <button id="btnAddWorkItem" class="btn btn-outline-secondary">Добавить работу</button>
+              </div>
+
+              <div class="col-12 col-md-6">
+                <h3 class="h6">Материалы</h3>
+                <div class="mb-2">
+                  <input id="matItemName" class="form-control" placeholder="Масло 5W-30">
+                </div>
+                <div class="row g-2 mb-2">
+                  <div class="col-6"><input id="matItemQty" class="form-control" placeholder="1"></div>
+                  <div class="col-6"><input id="matItemPrice" class="form-control" placeholder="1900"></div>
+                </div>
+                <button id="btnAddMaterialItem" class="btn btn-outline-secondary">Добавить материал</button>
+              </div>
+            </div>
+
+            <hr />
+
+            <div class="row g-2 align-items-end">
+              <div class="col-12 col-md-4">
+                <label class="form-label">Оплата (сумма)</label>
+                <input id="payAmount" class="form-control" placeholder="3500">
+              </div>
+              <div class="col-12 col-md-8">
+                <button id="btnPayFull" class="btn btn-outline-success">Провести оплату</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Output -->
+      <div class="col-12">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <h2 class="h5">Вывод</h2>
+            <pre id="output" class="bg-dark text-light p-3 rounded-3" style="min-height: 220px; white-space: pre-wrap;"></pre>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="./app.js"></script>
+</body>
+</html>

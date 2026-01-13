@@ -1,0 +1,58 @@
+﻿name: CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build and start stack (db + api)
+        run: docker compose up -d --build
+
+      - name: Wait for API health
+        run: |
+          for i in {1..30}; do
+            if curl -fsS http://127.0.0.1:3000/health && curl -fsS http://127.0.0.1:3000/health/db; then
+              echo "API is healthy"
+              exit 0
+            fi
+            echo "Waiting for API..."
+            sleep 2
+          done
+          echo "API did not become healthy"
+          docker compose ps
+          docker compose logs --tail 200 api
+          docker compose logs --tail 200 db
+          exit 1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies (incl. devDeps for newman)
+        run: npm ci
+
+      - name: Run API tests (Newman)
+        run: npm run test:api
+
+      - name: Show logs on failure
+        if: failure()
+        run: |
+          docker compose ps
+          docker compose logs --tail 200 api
+          docker compose logs --tail 200 db
+
+      - name: Shutdown
+        if: always()
+        run: docker compose down -v --remove-orphans
